@@ -1,19 +1,15 @@
 import random
-import sys
+from utils.Constants import Constants
+from model.Population import Population
+from utils.TextUtils import TextUtils
 
-from Constants import Constants
-from Population import Population
-
-
+"""
+This class implements a genetic algorithm to evolve a population of individuals towards a target solution.
+@author carmelolg
+"""
 class GeneticAlgorithm:
     constants = Constants()
     population_object = Population()
-
-    def mutation(self, x):
-        tmp_word = list(x.word)
-        tmp_word[random.randint(0, len(x.word) - 1)] = random.choice(self.constants.all_chars)
-        x.word = "".join(tmp_word)
-        x.fitness = self.population_object.fitness(x.word)
 
     def run(self):
 
@@ -33,7 +29,7 @@ class GeneticAlgorithm:
                 r = random.random()
 
                 if r > self.constants.mutation_threshold:
-                    self.mutation(new_i)
+                    TextUtils.mutation(new_i)
 
                 self.population_object.population.append(new_i)
                 i = i + 2

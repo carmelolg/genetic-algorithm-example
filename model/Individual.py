@@ -1,3 +1,9 @@
+"""
+This class represents an individual in a population for a genetic algorithm.
+Each individual has a word and a fitness score.
+
+@author carmelolg
+"""
 class Individual:
     word = ''
     fitness = 4
