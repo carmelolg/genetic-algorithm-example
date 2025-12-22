@@ -1,4 +1,4 @@
-# Genetic Algorithm Learning
+# Genetic Algorithm Example
 
 ![Genetic Algorithm Logo](static/logo.svg)
 
@@ -22,10 +22,10 @@ This project implements a basic genetic algorithm in Python to evolve a populati
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-username/genetic-algorithm-learning.git
-    cd genetic-algorithm-learning
+    git clone https://github.com/your-username/genetic-algorithm-example.git
+    cd genetic-algorithm-example
     ```
-    (Note: Replace `https://github.com/your-username/genetic-algorithm-learning.git` with the actual repository URL if this project is hosted.)
+    (Note: Replace `https://github.com/your-username/genetic-algorithm-Example.git` with the actual repository URL if this project is hosted.)
 
 2.  Install the required Python packages:
     ```bash
