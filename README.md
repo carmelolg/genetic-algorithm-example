@@ -16,7 +16,7 @@ and published on PyPI: the project only describes the problem, the library runs 
 ## Requirements
 
 -   Python 3.10+
--   [GALib](https://carmelolg.github.io/GALib/) (`carmelolg-galib` on [PyPI](https://pypi.org/project/carmelolg-galib/)), installed by `requirements.txt` in the 0.2.x series.
+-   [GALib](https://carmelolg.github.io/GALib/) (`carmelolg-galib` on [PyPI](https://pypi.org/project/carmelolg-galib/)), installed by `requirements.txt`. `--workers` and `--history-every` need a GALib release that includes them.
 -   `matplotlib`, only for `--plot`.
 
 ## Installation
@@ -43,6 +43,9 @@ python main.py
 | `--mutation-rate` | `1/length` | per-gene mutation probability |
 | `--stagnation` | off | stop after N generations without improvement |
 | `--seed` | random | seed for reproducible runs |
+| `--workers` | off | evaluate each generation with N parallel workers (the phrase is cheap to score, so this is mostly a demo) |
+| `--parallel` | `process` | `process` or `thread`, used with `--workers` |
+| `--history-every` | 1 | keep the best genome in the history only every N generations (less memory on long runs) |
 | `--plot` | off | plot fitness and diversity at the end |
 
 For example:

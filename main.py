@@ -19,6 +19,10 @@ def parse_args(argv=None) -> argparse.Namespace:
     p.add_argument('--mutation-rate', type=float, default=None, help='per-gene mutation probability (default: 1/length)')
     p.add_argument('--stagnation', type=int, default=None, help='stop after N generations without improvement')
     p.add_argument('--seed', type=int, default=None, help='random seed for reproducible runs')
+    p.add_argument('--workers', type=int, default=None, help='evaluate each generation with N parallel workers (default: serial)')
+    p.add_argument('--parallel', choices=('process', 'thread'), default='process', help='kind of workers used by --workers')
+    p.add_argument('--history-every', type=int, default=None,
+                   help='keep the best genome in the history only every N generations (default: every generation)')
     p.add_argument('--plot', action='store_true', help='plot fitness and diversity at the end (needs matplotlib)')
     return p.parse_args(argv)
 
@@ -28,6 +32,11 @@ def build_algorithm(args: argparse.Namespace) -> GeneticAlgorithm:
     stop = [TargetFitness(0)]
     if args.stagnation is not None:
         stop.append(Stagnation(args.stagnation))
+    options = {}
+    if args.workers:
+        options.update(workers=args.workers, parallel=args.parallel)
+    if args.history_every is not None:
+        options.update(history_genome_every=args.history_every)
     return GeneticAlgorithm(
         problem,
         population_size=args.population,
@@ -37,6 +46,7 @@ def build_algorithm(args: argparse.Namespace) -> GeneticAlgorithm:
         stop=stop,
         callbacks=[PrintProgress(in_place=True)],
         seed=args.seed,
+        **options,
     )
 
 

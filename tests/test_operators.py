@@ -58,6 +58,19 @@ class CommandLineTests(unittest.TestCase):
         second, _ = self.run_main('--solution', 'hello', '--population', '50', '--seed', '7')
         self.assertEqual([s.best_genome for s in first.history], [s.best_genome for s in second.history])
 
+    def test_workers_do_not_change_the_run(self):
+        serial, _ = self.run_main('--solution', 'hello', '--population', '50', '--seed', '7')
+        threaded, _ = self.run_main('--solution', 'hello', '--population', '50', '--seed', '7',
+                                    '--workers', '2', '--parallel', 'thread')
+        self.assertEqual([s.best_fitness for s in serial.history], [s.best_fitness for s in threaded.history])
+
+    def test_history_every_thins_the_stored_genomes(self):
+        result, _ = self.run_main('--solution', 'hello world', '--population', '50', '--seed', '3',
+                                  '--history-every', '5')
+        kept = [s.generation for s in result.history if s.best_genome is not None]
+        self.assertTrue(all(g % 5 == 0 for g in kept[:-1]))
+        self.assertLess(len(kept), len(result.history))
+
     def test_stagnation_option(self):
         result, _ = self.run_main('--solution', 'hello', '--population', '4', '--generations', '1000',
                                   '--stagnation', '3', '--mutation-rate', '0', '--seed', '1')
