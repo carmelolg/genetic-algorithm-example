@@ -1,2 +1,1 @@
-# GALib, published on PyPI. While it is 0.x a minor release can change the API, hence the upper bound.
-carmelolg-galib>=0.2.0,<0.3
+textdistance

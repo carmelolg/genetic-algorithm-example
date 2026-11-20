@@ -1,65 +1,52 @@
-"""Command line entry point: evolves random strings towards a target phrase with galib.
+import random
+from utils.Constants import Constants
+from model.Population import Population
+from utils.TextUtils import TextUtils
 
+"""
+This class implements a genetic algorithm to evolve a population of individuals towards a target solution.
 @author carmelolg
 """
-import argparse
+class GeneticAlgorithm:
+    constants = Constants()
+    population_object = Population()
 
-from carmelolg.galib import GeneticAlgorithm, PrintProgress, Result, Stagnation, TargetFitness
-from carmelolg.galib.operators import Tournament
+    def run(self):
 
-from phrase import DEFAULT_TARGET, PhraseProblem
+        loop = True
+        local_generations = 0
 
+        # STEP 1 - generate a random population
+        self.population_object.generate(self.constants.population_number)
 
-def parse_args(argv=None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description='Genetic algorithm that evolves random strings towards a target phrase.')
-    p.add_argument('--solution', default=DEFAULT_TARGET, help='target phrase')
-    p.add_argument('--population', type=int, default=1000, help='population size')
-    p.add_argument('--generations', type=int, default=50000, help='maximum number of generations')
-    p.add_argument('--tournament', type=int, default=3, help='tournament size for parent selection')
-    p.add_argument('--mutation-rate', type=float, default=None, help='per-gene mutation probability (default: 1/length)')
-    p.add_argument('--stagnation', type=int, default=None, help='stop after N generations without improvement')
-    p.add_argument('--seed', type=int, default=None, help='random seed for reproducible runs')
-    p.add_argument('--workers', type=int, default=None, help='evaluate each generation with N parallel workers (default: serial)')
-    p.add_argument('--parallel', choices=('process', 'thread'), default='process', help='kind of workers used by --workers')
-    p.add_argument('--history-every', type=int, default=None,
-                   help='keep the best genome in the history only every N generations (default: every generation)')
-    p.add_argument('--plot', action='store_true', help='plot fitness and diversity at the end (needs matplotlib)')
-    return p.parse_args(argv)
+        while local_generations < self.constants.generations and loop:
+            population_list = self.population_object.get_population()
 
+            i = 0
+            for k in range(int(len(population_list) / 2)):
+                # STEP 2 - the evolution of the species (with mutation if needed)
+                new_i = self.population_object.crossover(population_list[i], population_list[i + 1])
+                r = random.random()
 
-def build_algorithm(args: argparse.Namespace) -> GeneticAlgorithm:
-    problem = PhraseProblem(args.solution)
-    stop = [TargetFitness(0)]
-    if args.stagnation is not None:
-        stop.append(Stagnation(args.stagnation))
-    options = {}
-    if args.workers:
-        options.update(workers=args.workers, parallel=args.parallel)
-    if args.history_every is not None:
-        options.update(history_genome_every=args.history_every)
-    return GeneticAlgorithm(
-        problem,
-        population_size=args.population,
-        max_generations=args.generations,
-        selection=Tournament(args.tournament),
-        mutation_rate=args.mutation_rate,
-        stop=stop,
-        callbacks=[PrintProgress(in_place=True)],
-        seed=args.seed,
-        **options,
-    )
+                if r > self.constants.mutation_threshold:
+                    TextUtils.mutation(new_i)
+
+                self.population_object.population.append(new_i)
+                i = i + 2
+
+            # STEP 3 - remove all members that are not fitting the solution
+            self.population_object.natural_selection()
+
+            best_individual = self.population_object.get_population()[0]
+
+            # STEP 4 - exit condition
+            if best_individual.fitness == 0:
+                loop = False
+
+            print('\r' + best_individual.word, end='', flush=True)
+
+            local_generations = local_generations + 1
 
 
-def main(argv=None) -> Result:
-    args = parse_args(argv)
-    result = build_algorithm(args).run()
-    print(f'best: {result.best.genome!r} ({result.best.fitness:g} wrong characters) '
-          f'after {result.generations} generations, stopped by {result.stopped_by}')
-    if args.plot:
-        from carmelolg.galib.plot import plot_history
-        plot_history(result)
-    return result
-
-
-if __name__ == '__main__':
-    main()
+runner = GeneticAlgorithm()
+runner.run()
